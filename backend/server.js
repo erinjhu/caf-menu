@@ -22,6 +22,22 @@ app.post('/api/items', (req, res) => {
   const price = req.body.price
   const location = req.body.location
 
+  console.log('Received data:', { itemName, price, location })
+  console.log('Type of price:', typeof price)
+
+
+  // Validation
+  if (!itemName || itemName.trim() === '' ) {
+    return res.status(400).json({error: "Empty item name or doesn't exist"})
+  } 
+  if (!price || typeof price !== 'number') {
+    return res.status(400).json({message: "Price is not a number or doesn't exist"})
+  }  
+  if (!location || location.trim() === '') {
+    return res.status(400).json({error: "Empty location or doesn't exist"})
+  }
+
+  // Success response
   res.json({
     message: "Item submitted successfully",
     item: {

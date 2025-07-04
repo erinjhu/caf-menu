@@ -89,6 +89,42 @@ app.delete('/api/items/:id', (req, res) => {
   }
 })
 
+app.put('/api/items/:id', (req, res) => {
+  // Extract ID from URL parameter
+  const targetId = parseInt(req.params.id)
+  // Find the item in the array
+  const index = items.findIndex(item => item.id == targetId)
+  // Extract update data from request body
+  const updateData = req.body
+  if (index === -1) {
+    return res.status(404).json({
+      error: "Item not found"
+    })
+  }
+  // Validate the update data (if provided)
+  // Check if a property is undefined, null, empty (white spaces)
+  if (updateData.itemName !== undefined && (!updateData.itemName || updateData.itemName.trim() === '') ) {
+    return res.status(400).json({error: "Empty item name"})
+  }
+  if (updateData.price !== undefined && (!updateData.price || typeof updateData.price !== 'number')) {
+    return res.status(400).json({error: "Price must be a number"})
+  }
+  if (updateData.location !== undefined && (!updateData.location || updateData.location.trim() === '')) {
+    return res.status(400).json({error: "Empty location"})
+  }
+  // Update the item
+  const existingItem = items[index]
+  // Update provided fields
+  if (updateData.itemName !== undefined) existingItem.name = updateData.itemName
+  if (updateData.price !== undefined) existingItem.price = updateData.price
+  if (updateData.location !== undefined) existingItem.location = updateData.location
+  existingItem.updatedAt = new Date()
+  res.json({
+    message: "Item updated sucessfully",
+    item: existingItem
+  })
+})
+
 // Start server
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

@@ -61,12 +61,28 @@ export const styles = StyleSheet.create({
       fontWeight: 'bold',
   },
   searchInput: {
-      color: '#CBCBCB',
       borderWidth: 1,
+      flex: 1,
       borderColor: '#007AFF',
       padding: 10,
-      marginBottom: 15,
+      marginBottom: 0,
       borderRadius: 5,
       backgroundColor: '#f8f9fa',
+  },
+    searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  clearButton: {
+    marginLeft: 10,
+    padding: 8,
+    backgroundColor: '#ff4444',
+    borderRadius: 15,
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 })

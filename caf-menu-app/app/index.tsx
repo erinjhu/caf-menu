@@ -74,6 +74,10 @@ export default function HomeScreen() {
         }
     }
 
+    const clearSearch = () => {
+        setSearchText('')
+    }
+
     // Styles for each item
     const renderItem = ({ item } : { item: any }) => {
         return ( 
@@ -107,6 +111,7 @@ export default function HomeScreen() {
                 placeholder="Iten name"
                 value={itemName}
                 onChangeText={setItemName}
+                placeholderTextColor={'#CBCBCB'}
             />
             <TextInput 
                 style={styles.input}
@@ -114,12 +119,14 @@ export default function HomeScreen() {
                 value={price}
                 onChangeText={setPrice}
                 keyboardType="numeric"
+                placeholderTextColor={'#CBCBCB'}
             />
             <TextInput 
                 style={styles.input}
                 placeholder="Location"
                 value={location}
                 onChangeText={setLocation}
+                placeholderTextColor={'#CBCBCB'}
             />
             <TouchableOpacity 
                 style={styles.button}
@@ -128,14 +135,22 @@ export default function HomeScreen() {
                 <Text style={styles.buttonText}>Add Item</Text>
             </TouchableOpacity>
 
-            <TextInput
-                style={styles.searchInput}
-                placeholder="Search menu items..."
-                value={searchText}
-                onChangeText={setSearchText}
-            />
             
-
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search menu items"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    placeholderTextColor={'#CBCBCB'}
+                />
+                <TouchableOpacity 
+                    style={styles.clearButton}
+                    onPress={clearSearch}
+                >
+                    <Text style={styles.clearButtonText}>✕</Text>
+                </TouchableOpacity>
+            </View>
 
 
             <FlatList

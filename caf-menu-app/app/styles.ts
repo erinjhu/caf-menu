@@ -60,4 +60,13 @@ export const styles = StyleSheet.create({
       textAlign: 'center',
       fontWeight: 'bold',
   },
+  searchInput: {
+      color: '#CBCBCB',
+      borderWidth: 1,
+      borderColor: '#007AFF',
+      padding: 10,
+      marginBottom: 15,
+      borderRadius: 5,
+      backgroundColor: '#f8f9fa',
+  },
 })

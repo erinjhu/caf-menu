@@ -16,6 +16,7 @@ export default function HomeScreen() {
     const [itemName, setItemName] = useState('')
     const [price, setPrice] = useState('')
     const [location, setLocation] = useState('')
+    const [searchText, setSearchText] = useState('')
 
     // Actions
     const [loading, setLoading] = useState(true)
@@ -84,6 +85,10 @@ export default function HomeScreen() {
         )
     }
 
+    const filteredItems = items.filter((item:any) => 
+        item.name.toLowerCase().includes(searchText.toLowerCase())
+    )
+
     // 
     if (loading) {
         return (
@@ -123,9 +128,18 @@ export default function HomeScreen() {
                 <Text style={styles.buttonText}>Add Item</Text>
             </TouchableOpacity>
 
+            <TextInput
+                style={styles.searchInput}
+                placeholder="Search menu items..."
+                value={searchText}
+                onChangeText={setSearchText}
+            />
+            
+
+
 
             <FlatList
-                data={items}
+                data={filteredItems}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 style={styles.list}

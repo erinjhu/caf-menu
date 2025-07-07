@@ -41,4 +41,23 @@ export const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
+  button: {
+      backgroundColor: '#007AFF',
+      padding: 15,
+      borderRadius: 5,
+      marginBottom: 20,
+  },
+  buttonText: {
+      color: '#fff',
+      textAlign: 'center',
+      fontWeight: 'bold',
+  },
 })

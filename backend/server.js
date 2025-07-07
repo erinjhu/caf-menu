@@ -76,16 +76,6 @@ app.post('/api/items', async (req, res) => {
     return res.status(400).json({error: "Empty location or doesn't exist"})
   }
 
-  // Code for test array
-  // const newItem = {
-  //   id: Date.now(),
-  //   name: itemName,
-  //   price: price,
-  //   location: location,
-  //   createdAt: new Date()
-  // }
-  // items.push(newItem)
-
   try {
     // Insert into database
     const result = await pool.query(
@@ -111,12 +101,6 @@ app.post('/api/items', async (req, res) => {
 
 // Retrieve submitted menu items for user
 app.get('/api/items', async (req, res) => {
-  // Old code for array
-  // res.json({
-  //   message: "All menu items",
-  //   count: items.length,
-  //   items: items
-  // })
   try {
     const result = await pool.query('SELECT * FROM items ORDER BY created_at DESC')
     res.json({
@@ -134,22 +118,7 @@ app.get('/api/items', async (req, res) => {
 
 // Delete
 app.delete('/api/items/:id', async (req, res) => {
-  // Old code for testing array
-  // // Extract ID from URL parameter
-  // const targetId = parseInt(req.params.id)
-  // // Find the item in the array
-  // const index = items.findIndex(item => item.id == targetId)
-  // // Remove it if found
-  // if (index !== -1) {
-  //   items.splice(index, 1) // remove 1 item from given index
-  //   res.json({
-  //     message: "Deleted item"
-  //   })
-  // } else {
-  //   res.status(404).json({
-  //     error: "Item not found"
-  //   })
-  // }
+ 
   const targetId = parseInt(req.params.id)
 
   try {
@@ -181,16 +150,6 @@ app.put('/api/items/:id', async (req, res) => {
   // Extract ID from URL parameter
   const targetId = parseInt(req.params.id)
   const updateData = req.body
-  // Old code from array
-  // // Find the item in the array
-  // const index = items.findIndex(item => item.id == targetId)
-  // // Extract update data from request body
-  // const updateData = req.body
-  // if (index === -1) {
-  //   return res.status(404).json({
-  //     error: "Item not found"
-  //   })
-  // }
   // Validate the update data (if provided)
   // Check if a property is undefined, null, empty (white spaces)
   if (updateData.itemName !== undefined && (!updateData.itemName || updateData.itemName.trim() === '') ) {

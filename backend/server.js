@@ -8,6 +8,14 @@ const port = process.env.PORT || 3000
 // Old test array
 // const items = []
 
+// CORS middleware for mobile development
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  res.header('Access-Control-Allow-Headers', 'Content-Type')
+  next()
+})
+
 // Database
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL
@@ -256,6 +264,6 @@ app.put('/api/items/:id', async (req, res) => {
 })
 
 // Start server
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Example app listening on port ${port}`)
 })

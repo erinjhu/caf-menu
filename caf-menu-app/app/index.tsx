@@ -32,6 +32,7 @@ export default function HomeScreen() {
     // Actions
     const [loading, setLoading] = useState(true)
     const [isAdding, setIsAdding] = useState(false)
+    const [editingItem, setEditingItem] = useState<MenuItem | null>(null)
 
     // This hook calls fetChItems once when the app first loads
     useEffect(() => {
@@ -74,6 +75,10 @@ export default function HomeScreen() {
         } finally {
             setIsAdding(false)
         }
+    }
+
+    const updateItem = async () => {
+        console.log('updateItem')
     }
 
     const clearSearch = () => {
@@ -126,7 +131,16 @@ export default function HomeScreen() {
                                 item.name.toLowerCase().includes(itemName.toLowerCase())
                         )
                         .map((item) => (
-                            <Text key={item.id} style={{color: '#888', fontSize: 12}}>
+                            <Text 
+                            key={item.id} 
+                            style={{color: '#888', fontSize: 12}}
+                            onPress={() => {
+                                setEditingItem(item);
+                                setItemName(item.name);
+                                setPrice(item.price.toString());
+                                setSelectedLocations([item.location]);
+                            }}
+                            >
                                 {item.name} ({item.location})
                             </Text>
                         ))
@@ -142,7 +156,9 @@ export default function HomeScreen() {
                 keyboardType="numeric"
                 placeholderTextColor={'#CBCBCB'}
             />
-            <Text style={styles.sectionTitle}>Select Location</Text>
+            <Text style={styles.sectionTitle}>
+                {editingItem ? 'Add Location' : 'Select Location'}
+            </Text>
             
 
             <Picker
@@ -151,9 +167,18 @@ export default function HomeScreen() {
                 style={styles.picker}
             >
                 <Picker.Item label="Select a location..." value="" />
-                {WATERLOO_LOCATIONS.map((location) => (
-                    <Picker.Item key={location} label={location} value={location} />
-                ))}
+                {WATERLOO_LOCATIONS
+                    .filter(location =>
+                        // Get locations that haven't been added by checking
+                        // if it is NOT an existing item with same name & location
+                        !items.some(
+                            item => item.name === itemName && item.location === location
+                        )
+
+                    )
+                    .map((location) => (
+                        <Picker.Item key={location} label={location} value={location} />
+                    ))}
             </Picker>       
 
             <TouchableOpacity
@@ -169,9 +194,11 @@ export default function HomeScreen() {
             
             <TouchableOpacity 
                 style={styles.button}
-                onPress={addItem}
+                onPress={editingItem ? updateItem : addItem}
             >
-                <Text style={styles.buttonText}>Add Item</Text>
+                <Text style={styles.buttonText}>
+                    {editingItem ? 'Update Item' : 'Add Item'}
+                </Text>
             </TouchableOpacity>
 
             

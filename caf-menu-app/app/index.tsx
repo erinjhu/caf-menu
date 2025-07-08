@@ -155,6 +155,17 @@ export default function HomeScreen() {
                     <Picker.Item key={location} label={location} value={location} />
                 ))}
             </Picker>       
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                    setItemName('');
+                    setPrice('');
+                    setSelectedLocations([]);
+                }}
+            >
+                <Text style={styles.buttonText}>Clear</Text>
+            </TouchableOpacity>
             
             <TouchableOpacity 
                 style={styles.button}

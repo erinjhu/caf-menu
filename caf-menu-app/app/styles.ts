@@ -45,6 +45,9 @@ export const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
+  itemDate: {
+
+  },
   
   // ===== FORM INPUTS =====
   input: {
@@ -115,5 +118,11 @@ export const styles = StyleSheet.create({
   checkboxLabel: {
     fontSize: 16,
     color: '#333',
+  },
+
+
+  // ==== PICKER ====
+  picker: {
+
   },
 })

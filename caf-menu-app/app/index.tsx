@@ -81,6 +81,9 @@ export default function HomeScreen() {
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemPrice}>${item.price}</Text>
                 <Text style={styles.itemLocation}>{item.location}</Text>
+                <Text style={styles.itemDate}>
+                    Last updated: {new Date(item.last_updated).toLocaleString()}
+                </Text>
             </View>
         )
     }
@@ -115,19 +118,19 @@ export default function HomeScreen() {
                 keyboardType="numeric"
                 placeholderTextColor={'#CBCBCB'}
             />
-            <Text style={styles.sectionTitle}>Select Location(s)</Text>
-            {WATERLOO_LOCATIONS.map((location) => (
-                <TouchableOpacity
-                    key={location}
-                    style={styles.checkboxContainer}
-                    onPress={() => setSelectedLocations(toggleLocationInArray(selectedLocations, location))}
-                >
-                    <Text style={styles.checkbox}>
-                        {selectedLocations.includes(location) ? '☑️' : '☐'}
-                    </Text>
-                    <Text style={styles.checkboxLabel}>{location}</Text>
-                </TouchableOpacity>
-            ))}
+            <Text style={styles.sectionTitle}>Select Location</Text>
+            
+
+            <Picker
+                selectedValue={selectedLocations[0] || ''}
+                onValueChange={(itemValue: string) => setSelectedLocations([itemValue])}
+                style={styles.picker}
+            >
+                <Picker.Item label="Select a location..." value="" />
+                {WATERLOO_LOCATIONS.map((location) => (
+                    <Picker.Item key={location} label={location} value={location} />
+                ))}
+            </Picker>       
             
             <TouchableOpacity 
                 style={styles.button}

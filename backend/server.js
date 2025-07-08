@@ -77,7 +77,7 @@ app.post('/api/items', async (req, res) => {
     // Insert into database
     const insertPromises = locations.map(location =>
       pool.query(
-        'INSERT INTO items (name, price, location) VALUES ($1, $2, $3) RETURNING *',
+        'INSERT INTO items (name, price, location, last_updated) VALUES ($1, $2, $3, NOW()) RETURNING *',
         [itemName, price, location]
       )
     )
@@ -198,7 +198,7 @@ app.put('/api/items/:id', async (req, res) => {
       return res.status(400).json({error: "No valid fields to update"})
     }
 
-    updates.push(`updated_at = CURRENT_TIMESTAMP`)
+    updates.push(`last_updated = CURRENT_TIMESTAMP`)
     values.push(targetId)
 
     const query = `UPDATE items SET ${updates.join(`, `) } WHERE id = $${paramCount} RETURNING *`

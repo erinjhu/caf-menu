@@ -7,6 +7,14 @@ import { styles } from './styles'
 import { fetchMenuItems, addMenuItem, filterItems, toggleLocationInArray  } from './functions/menuApi'
 import { WATERLOO_LOCATIONS } from './constants/locations'
 
+type MenuItem = {
+    id: number;
+    name: string;
+    price: number;
+    location: string;
+    last_updated?: string;
+};
+
 
 // Create React component, main component to display
 export default function HomeScreen() {
@@ -14,7 +22,7 @@ export default function HomeScreen() {
     // useState makes React re-render it when it changes
 
     // Data
-    const [items, setItems] = useState([])
+    const [items, setItems] = useState<MenuItem[]>([])
     const [itemName, setItemName] = useState('')
     const [price, setPrice] = useState('')
     //const [location, setLocation] = useState('')
@@ -110,6 +118,22 @@ export default function HomeScreen() {
                 onChangeText={setItemName}
                 placeholderTextColor={'#CBCBCB'}
             />
+            {itemName.length > 0 && (
+                <View style={{marginBottom: 8}}>
+                    {items
+                        .filter(
+                            (item) => 
+                                item.name.toLowerCase().includes(itemName.toLowerCase())
+                        )
+                        .map((item) => (
+                            <Text key={item.id} style={{color: '#888', fontSize: 12}}>
+                                {item.name} ({item.location})
+                            </Text>
+                        ))
+                    }
+                </View>
+            )}
+
             <TextInput 
                 style={styles.input}
                 placeholder="Price"

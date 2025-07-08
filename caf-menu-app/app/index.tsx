@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Text, View, FlatList, Alert, TextInput, TouchableOpacity } from 'react-native'
+import { Picker } from '@react-native-picker/picker'
 import axios from 'axios'
-import { styles } from './styles'
 
-// const API_BASE_URL = 'http://10.185.34.99:3000/api'
-const API_BASE_URL = 'http://172.20.10.2:3000/api'
+import { styles } from './styles'
+import { fetchMenuItems, addMenuItem, filterItems, toggleLocationInArray  } from './functions/menuApi'
+import { WATERLOO_LOCATIONS } from './constants/locations'
+
 
 // Create React component, main component to display
 export default function HomeScreen() {
@@ -15,8 +17,9 @@ export default function HomeScreen() {
     const [items, setItems] = useState([])
     const [itemName, setItemName] = useState('')
     const [price, setPrice] = useState('')
-    const [location, setLocation] = useState('')
+    //const [location, setLocation] = useState('')
     const [searchText, setSearchText] = useState('')
+    const [selectedLocations, setSelectedLocations] = useState<string[]>([])
 
     // Actions
     const [loading, setLoading] = useState(true)
@@ -31,21 +34,17 @@ export default function HomeScreen() {
     // Only update the items if it's able to get the data from the backend
     const fetchItems = async () => {
         try {
-            console.log('Starting API call')
-            const response = await axios.get(`${API_BASE_URL}/items`)
-            console.log('API response: ', response.data)
-            setItems(response.data.items)
-            setLoading(false)
+            const items = await fetchMenuItems()
+            setItems(items)
         } catch (error) {
-            console.log('Error')
             Alert.alert('Error', 'Failed to fetch items')
-            setLoading(false)
         }
+        setLoading(false)
     }
 
     const addItem = async () => {
 
-        if (!itemName || !price || !location) {
+        if (!itemName || !price || selectedLocations.length === 0) {
             Alert.alert('Error', 'Please fill in all fields')
             return
         }
@@ -53,18 +52,13 @@ export default function HomeScreen() {
         setIsAdding(true)
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/items`, {
-                itemName: itemName,
-                price: parseFloat(price),
-                location: location
-            } )
-
+            await addMenuItem(itemName, parseFloat(price), selectedLocations)
             Alert.alert('Success', 'Item added successfully!')
 
             // Clear and refresh
             setItemName('')
             setPrice('')
-            setLocation('')
+            setSelectedLocations([])
             fetchItems()
 
         } catch (error) {
@@ -78,6 +72,8 @@ export default function HomeScreen() {
         setSearchText('')
     }
 
+
+
     // Styles for each item
     const renderItem = ({ item } : { item: any }) => {
         return ( 
@@ -89,11 +85,9 @@ export default function HomeScreen() {
         )
     }
 
-    const filteredItems = items.filter((item:any) => 
-        item.name.toLowerCase().includes(searchText.toLowerCase())
-    )
+    const filteredItems = filterItems(items, searchText)
 
-    // 
+
     if (loading) {
         return (
             <View style={styles.container}>
@@ -121,13 +115,20 @@ export default function HomeScreen() {
                 keyboardType="numeric"
                 placeholderTextColor={'#CBCBCB'}
             />
-            <TextInput 
-                style={styles.input}
-                placeholder="Location"
-                value={location}
-                onChangeText={setLocation}
-                placeholderTextColor={'#CBCBCB'}
-            />
+            <Text style={styles.sectionTitle}>Select Location(s)</Text>
+            {WATERLOO_LOCATIONS.map((location) => (
+                <TouchableOpacity
+                    key={location}
+                    style={styles.checkboxContainer}
+                    onPress={() => setSelectedLocations(toggleLocationInArray(selectedLocations, location))}
+                >
+                    <Text style={styles.checkbox}>
+                        {selectedLocations.includes(location) ? '☑️' : '☐'}
+                    </Text>
+                    <Text style={styles.checkboxLabel}>{location}</Text>
+                </TouchableOpacity>
+            ))}
+            
             <TouchableOpacity 
                 style={styles.button}
                 onPress={addItem}

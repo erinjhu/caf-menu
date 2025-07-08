@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native'
 
 export const styles = StyleSheet.create({
+  
+  // ===== MAIN LAYOUT =====
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -17,6 +19,8 @@ export const styles = StyleSheet.create({
   list: {
     flex: 1,
   },
+  
+  // ===== MENU ITEMS =====
   itemContainer: {
     backgroundColor: '#f8f9fa',
     padding: 16,
@@ -41,6 +45,8 @@ export const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
+  
+  // ===== FORM INPUTS =====
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -60,6 +66,8 @@ export const styles = StyleSheet.create({
       textAlign: 'center',
       fontWeight: 'bold',
   },
+  
+  // ===== SEARCH BAR =====
   searchInput: {
       borderWidth: 1,
       flex: 1,
@@ -69,7 +77,7 @@ export const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#f8f9fa',
   },
-    searchContainer: {
+  searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
@@ -84,5 +92,28 @@ export const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+  
+  // ===== CHECKBOXES =====
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 10,
+    color: '#333',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    padding: 5,
+  },
+  checkbox: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: '#333',
   },
 })

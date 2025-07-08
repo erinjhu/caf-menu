@@ -56,14 +56,11 @@ app.get('/api/db-test', async (req, res) => {
 
 // User submits menu items
 app.post('/api/items', async (req, res) => {
-  // Cpde fpr test arrau
-  // const itemName = req.body.itemName
-  // const price = req.body.price
-  // const location = req.body.location
-  const { itemName, price, location } = req.body
+  
+  const { itemName, price, locations } = req.body
 
-  console.log('Received data:', { itemName, price, location })
-  console.log('Type of price:', typeof price)
+  console.log('Received data:', { itemName, price, locations })
+  console.log('Number of locations:', locations ? locations.length : 0)
 
   // Validation
   if (!itemName || itemName.trim() === '' ) {
@@ -72,22 +69,25 @@ app.post('/api/items', async (req, res) => {
   if (!price || typeof price !== 'number') {
     return res.status(400).json({message: "Price is not a number or doesn't exist"})
   }  
-  if (!location || location.trim() === '') {
-    return res.status(400).json({error: "Empty location or doesn't exist"})
-  }
+  if (!locations || !Array.isArray(locations) || locations.length === 0) {
+    return res.status(400).json({error: "Must provide at least one location"})
+}
 
   try {
     // Insert into database
-    const result = await pool.query(
-      // items (column1, col2, col3) VALUES (data1, data2, data3)
-      // RETURNING * - return the newly created row; item with its ID and timestamps
-      'INSERT INTO items (name, price, location) VALUES($1, $2, $3) RETURNING *',
-      [itemName, price, location]
+    const insertPromises = locations.map(location =>
+      pool.query(
+        'INSERT INTO items (name, price, location) VALUES ($1, $2, $3) RETURNING *',
+        [itemName, price, location]
+      )
     )
+
+    const results = await Promise.all(insertPromises)
 
     res.json({
       message: "Item submitted successfully",
-      item: result.rows[0]
+      count: results.length,
+      items: results.map(result => result.rows[0])
     })
   } catch (error) {
     res.status(500).json({

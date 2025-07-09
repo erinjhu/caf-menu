@@ -4,7 +4,7 @@ import { Picker } from '@react-native-picker/picker'
 import axios from 'axios'
 
 import { styles } from './styles'
-import { fetchMenuItems, addMenuItem, filterItems, toggleLocationInArray  } from './functions/menuApi'
+import { fetchMenuItems, addMenuItem, filterItems, toggleLocationInArray, groupItemsByName  } from './functions/menuApi'
 import { WATERLOO_LOCATIONS } from './constants/locations'
 
 type MenuItem = {
@@ -58,6 +58,13 @@ export default function HomeScreen() {
             return
         }
 
+        const nameExists = items.some(item => item.name.toLowerCase() === itemName.toLowerCase());
+        if (nameExists) {
+            Alert.alert('Error', 'An item with this name already exists. Please edit it instead.');
+            return;
+        }
+
+
         setIsAdding(true)
 
         try {
@@ -78,7 +85,51 @@ export default function HomeScreen() {
     }
 
     const updateItem = async () => {
-        console.log('updateItem')
+        if(!editingItem) return
+
+        try {
+            const existingItems = items.filter(i => i.name === editingItem.name)
+
+            for (const item of existingItems) {
+                if (!selectedLocations.includes(item.location)) {
+                    await axios.delete(
+                        `http://localhost:3000/api/items/${item.id}`
+                    )
+                }
+            }
+
+            // If the location exists, update it. Otherwise, add it.
+            for (const location of selectedLocations) {
+                const existing = existingItems.find(i => i.location === location);
+                if (existing) {
+                    await axios.put (
+                        `http://localhost:3000/api/items/${editingItem.id}`,
+                        {
+                            itemName,
+                            price: parseFloat(price),
+                            location,
+                        }
+                    )
+                } else {
+                    await axios.post(
+                        `http://localhost:3000/api/items`,
+                        {
+                            itemName,
+                            price: parseFloat(price),
+                            locations: [location], // assuming your backend expects an array
+                        }
+                    );
+                }
+            }
+            Alert.alert('Success', 'Item updated!');
+            setEditingItem(null);
+            setItemName('');
+            setPrice('');
+            setSelectedLocations([]);
+            fetchItems();
+        } catch (error) {
+            Alert.alert('Error', 'Failed to update item')
+        }
     }
 
     const clearSearch = () => {
@@ -93,7 +144,9 @@ export default function HomeScreen() {
             <View style={styles.itemContainer}>
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemPrice}>${item.price}</Text>
-                <Text style={styles.itemLocation}>{item.location}</Text>
+                <Text style={styles.itemLocation}>
+                    Locations: {item.locations.join(', ')}
+                </Text>
                 <Text style={styles.itemDate}>
                     Last updated: {new Date(item.last_updated).toLocaleString()}
                 </Text>
@@ -102,6 +155,7 @@ export default function HomeScreen() {
     }
 
     const filteredItems = filterItems(items, searchText)
+    const groupedItems = groupItemsByName(items)
 
 
     if (loading) {
@@ -138,7 +192,10 @@ export default function HomeScreen() {
                                 setEditingItem(item);
                                 setItemName(item.name);
                                 setPrice(item.price.toString());
-                                setSelectedLocations([item.location]);
+                                setSelectedLocations(
+                                    // filter to items with the same name, then get an array with just the locations
+                                    items.filter(i => i.name === item.name).map(i => i.location)
+                                );
                             }}
                             >
                                 {item.name} ({item.location})
@@ -147,6 +204,18 @@ export default function HomeScreen() {
                     }
                 </View>
             )}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 8}}>
+                {selectedLocations.map(loc => (
+                    <TouchableOpacity
+                        key={loc}
+                        onPress={() => setSelectedLocations(selectedLocations.filter(l => l !== loc))}
+                        style={{ backgroundColor: '#eee', borderRadius: 12, padding: 6, margin: 4 }}
+                    >
+                        <Text style={{ color: '#333' }}>{loc} ✕</Text>
+                    </TouchableOpacity>
+                ))}
+
+            </View>
 
             <TextInput 
                 style={styles.input}
@@ -163,19 +232,16 @@ export default function HomeScreen() {
 
             <Picker
                 selectedValue={selectedLocations[0] || ''}
-                onValueChange={(itemValue: string) => setSelectedLocations([itemValue])}
+                onValueChange={(itemValue: string) => {
+                    if (itemValue && !selectedLocations.includes(itemValue)) {
+                        setSelectedLocations([...selectedLocations, itemValue]);
+                    }
+                }}
                 style={styles.picker}
             >
                 <Picker.Item label="Select a location..." value="" />
                 {WATERLOO_LOCATIONS
-                    .filter(location =>
-                        // Get locations that haven't been added by checking
-                        // if it is NOT an existing item with same name & location
-                        !items.some(
-                            item => item.name === itemName && item.location === location
-                        )
-
-                    )
+                    .filter(location => !selectedLocations.includes(location))
                     .map((location) => (
                         <Picker.Item key={location} label={location} value={location} />
                     ))}
@@ -220,7 +286,7 @@ export default function HomeScreen() {
 
 
             <FlatList
-                data={filteredItems}
+                data={filterItems(groupedItems, searchText)}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 style={styles.list}

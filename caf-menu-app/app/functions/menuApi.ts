@@ -47,3 +47,18 @@ export const toggleLocationInArray = (selectedLocations: string[], location: str
         return [...selectedLocations, location]
     }
 }
+
+export const groupItemsByName = (items: any[]) => {
+    const grouped: { [name: string]: any } = {}
+
+    items.forEach(item => {
+        // If an item is not in the group, add it
+        if (!grouped[item.name]) {
+            grouped[item.name] = { ...item, locations: [item.location] };
+        } else {
+            // If the item is already in the group, only add the location
+            grouped[item.name].locations.push(item.location);
+        }
+    })
+    return Object.values(grouped)
+}

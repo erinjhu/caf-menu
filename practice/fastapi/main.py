@@ -1,44 +1,45 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List
 
 app = FastAPI()
 
+items = [
+    {"name": "Pizza", "price": 10, "locations": ["REV", "V1"]},
+    {"name": "Burger", "price": 8, "locations": ["CMH"]},
+    {"name": "Salad", "price": 7, "locations": ["REV", "QNC"]}
+]
+
+# Item class
 class Item(BaseModel):
-    text: str = None
-    is_done: bool = False
+    name: str 
+    price: int 
+    locations: List[str]
 
-items = []
-
+# Home
 @app.get("/")
 def root():
     return {"Hello" : "World"}
 
-@app.post("/items")
-def create_item(item: Item):
-    items.append(item)
+# View all menu items
+@app.get("/items")
+def view_items():
     return items
 
-@app.get("/items", response_model=list[Item])
-def list_items(limit: int = 10):
-    return items[0:limit]
+# Submit menu items
+@app.post("/items")
+def submit_item(item: Item):
+    items.append(item)
+    return item
 
-@app.get("/items/{item_id}", response_model=Item)
-def get_item(item_id: int) -> Item:
-    if item_id < len(items):
-        return items[item_id]
-    else:
-        raise HTTPException(status_code=404, detail=f"Item {item_id} not found")
+# Delete menu items
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int):
+    items.pop(item_id)
+    return {"message" : "{item_id} : {item.name}  deleted"}
 
-# References
-# Python FastAPI Tutorial: Build a REST API in 15 Minutes https://www.youtube.com/watch?v=iWS9ogMPOI0
-
-# Add an item
-# curl -X POST -H "Content-Type: application/json" 'http://127.0.0.1:8000/items?item=apple'
-# curl -X POST -H "Content-Type: application/json" -d '{"text":"apple"}' 'http://127.0.0.1:8000/items'
-
-# Get a specific item
-# curl -X GET http://127.0.0.1:8000/items/0
-
-# Get the list of items
-# curl -X GET http://120.0.0.1:8000/items?limit=3
-
+# Edit menu items
+@app.put("/items/{item_id}")
+def edit_item(item_id: int, item: Item):
+    items[item_id] = item.dict()
+    return items

@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
 from supabase_client import supabase
 from typing import List
 from database import SessionLocal
 from models import DBItem
+from datetime import timedelta
+from auth import create_access_token, get_current_user
 
 app = FastAPI()
 
@@ -37,7 +39,7 @@ def view_items():
 
 # Submit menu items
 @app.post("/items")
-def submit_item(item: Item):
+def submit_item(item: Item, user: str = Depends(get_current_user)):
     db = SessionLocal()
     db_item = DBItem(
         name = item.name,
@@ -59,7 +61,7 @@ def delete_item(item_id: int):
 # Edit menu items
 @app.put("/items/{item_id}")
 def edit_item(item_id: int, item: Item):
-    items[item_id] = item.dict()
+    items[item_id] = item.model_dump()
     return items
 
 # --------- USER ACCOUNTS ---------
@@ -86,7 +88,8 @@ def register_user(request: RegisterRequest):
 # Login
 @app.post("/login")
 def login_user(request: LoginRequest):
-    result = supabase.auth.sign_in_with_password(email = request.email, password = request.password)
-    if result.get("error"):
-        raise HTTPException(status_code=400, detail=result["error"]["message"])
-    return {"message": "Login successful", "session": result["session"]}
+    result = supabase.auth.sign_in_with_password({"email": request.email, "password": request.password})
+    if not result.user:
+        raise HTTPException(status_code=400, detail="Registration failed.")
+    access_token = create_access_token(data={"sub": request.email})
+    return {"access_token": access_token, "token_type" : "bearer"}

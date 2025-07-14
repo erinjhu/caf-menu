@@ -2,7 +2,9 @@ from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+load_dotenv()
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+SC_SUPABASE_URL = os.getenv("SUPABASE_URL")
+SC_SUPABASE_KEY = os.getenv("SECRET_KEY")
+
+supabase: Client = create_client(SC_SUPABASE_URL, SC_SUPABASE_KEY)

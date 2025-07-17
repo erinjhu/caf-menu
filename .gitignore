@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .DS_Store
 practice/fastapi/.env
+practice/fastapi/tutorial2/.env

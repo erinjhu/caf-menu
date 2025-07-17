@@ -4,7 +4,7 @@ from supabase_client import supabase
 from typing import List
 from database import SessionLocal
 from models import DBItem
-from datetime import timedelta
+from datetime import timedelta, datetime
 from auth import create_access_token, get_current_user
 
 app = FastAPI()
@@ -24,6 +24,7 @@ class Item(BaseModel):
     price: int 
     locations: List[str]
 
+
 # Home
 @app.get("/")
 def root():
@@ -32,6 +33,7 @@ def root():
 # View all menu items
 @app.get("/items")
 def view_items():
+    print("hi")
     db = SessionLocal()
     items = db.query(DBItem).order_by(DBItem.id.asc()).all()
     db.close()
@@ -39,12 +41,18 @@ def view_items():
 
 # Submit menu items
 @app.post("/items")
-def submit_item(item: Item, user: str = Depends(get_current_user)):
+# commented out because auth not working
+# def submit_item(item: Item, user: str = Depends(get_current_user)):
+def submit_item(item: Item):
     db = SessionLocal()
+    now = datetime.utcnow()
     db_item = DBItem(
         name = item.name,
         price = item.price,
-        location = item.locations
+        location = item.locations,
+        created_at = now,
+        updated_at = now,
+        last_updated = now
     )
     db.add(db_item)
     db.commit()

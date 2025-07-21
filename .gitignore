@@ -4,3 +4,4 @@ __pycache__/
 .DS_Store
 practice/fastapi/.env
 practice/fastapi/tutorial2/.env
+.vscode

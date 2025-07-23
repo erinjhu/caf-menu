@@ -1,44 +1,94 @@
-#include <vector>
 #include <string>
-#include <unordered_map>
-#include <set>
+#include <vector>
 #include <algorithm>
+#include <iostream>
+using namespace std;
 
-std::vector<std::string> group_anagrams(std::vector<std::string> strs){
-    // sort all the strings
-    // hash map with <set of letters, count>
 
-    // iterate through the array
-        // sort the string
-        // if it's in the map
-            // increase the count
-        // else
-            // add it to the map and set the count to 1
-    // put the map back into an array and return the array
-    std::unordered_map<std::string, int> map;
-    for(int k{}; k < strs.size(); k++){
-        std::string str;
-        std::sort(str.begin(), str.end());
-        if(map.find(str) != map.end()){
-            map[str]++;
-        }else{
-            map.insert({str, 1});
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+
+        vector<vector<string>> return_array;
+        int word_count{};
+
+        while(strs.size() != 0){
+
+            vector<string> group_array;
+
+            // put the first word into the anagram group array
+            group_array.push_back(strs.front());
+            // sort the first word and store it in a variable
+            string sort_first_word = strs.front();
+            sort(sort_first_word.begin(), sort_first_word.end());
+            cout << "sort_first_word: " << sort_first_word << endl;
+            // remove the first word from strs
+            strs.erase(strs.begin());
+            cout << "strs: ";
+            cout << "[";
+            for (const auto& word : strs) {
+                cout << word << ", ";
+            }
+            cout << "]" << endl;
+            cout << "group_array: ";
+            cout << "[";
+            for (const auto& word : group_array) {
+                cout << word << ", ";
+            }
+            cout << "]" << endl;
+            word_count++;
+            // compare the first word to the rest of the words in strs
+            for (int k{}; k < strs.size(); k++) {
+                string sort_word = strs[k];
+                sort(sort_word.begin(), sort_word.end());
+                cout << "sort_word: " << sort_word << endl;
+                // if the sorted word matches the sorted first word
+                if(sort_word == sort_first_word){
+                    // add the ptr word to the group array
+                    group_array.push_back(strs[k]);
+                    strs.erase(strs.begin() + k);
+                    cout << "updated group_array: ";
+                    cout << "[";
+                    for (const auto& word : group_array) {
+                        cout << word << ", ";
+                    }
+                    cout << "]" << endl;
+                }
+            }
+            // add group array to return array
+            return_array.push_back(group_array);
+            cout << "updated return array" << endl;
+            for (const auto& group : return_array) {
+                cout << "[";
+                for (const auto& word : group) {
+                    cout << word << ", ";
+                }
+                cout << "],";
+            }
+            cout << endl;
+
         }
 
+        return return_array;
     }
-    std::vector<std::string> return_array{};
-    for(auto it = map.begin(); it != map.end(); ++it){
-        // store the key of the iterator
-        std::string str = it->first;
-        // add the key into the array for the number of times in the pair value
-        for(int k{}; k < it->second; k++){
-            return_array.push_back(str);
+};
+
+int main() {
+    Solution sol;
+    vector<string> strs = { "cat", "nob", "tac", "bar", "atc", "rab", "bon" };
+
+    cout << "original array" << endl;
+    for (const auto& word : strs) {
+            cout << word << " ";
+    }
+    cout << endl;
+
+    vector<vector<string>> grouped = sol.groupAnagrams(strs);
+    cout << "final array" << endl;
+    for (const auto& group : grouped) {
+        for (const auto& word : group) {
+            cout << word << " ";
         }
     }
-
-    return return_array;
-}
-
-int main(){
-    
+    cout << endl;
 }
